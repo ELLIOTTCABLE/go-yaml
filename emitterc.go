@@ -226,9 +226,11 @@ func yaml_emitter_append_tag_directive(emitter *yaml_emitter_t, value *yaml_tag_
 
 // Increase the indentation level.
 func yaml_emitter_increase_indent(emitter *yaml_emitter_t, flow, indentless bool) bool {
+	emitter.log.Printf("% v% 2d yaml_emitter_increase_indent(): flow=%t indentless=%t", emitter.indents, emitter.indent, flow, indentless)
 	emitter.indents = append(emitter.indents, emitter.indent)
 	if emitter.indent < 0 {
 		if emitter.indent_root_array && emitter.state == yaml_EMIT_BLOCK_SEQUENCE_FIRST_ITEM_STATE {
+			emitter.log.Printf("% v% 2d yaml_emitter_increase_indent():   root BLOCK_SEQUENCE_FIRST_ITEM_STATE; flow=%t indentless=%t", emitter.indents, emitter.indent, flow, indentless)
 			emitter.indent = emitter.best_array_indent
 		} else if flow {
 			emitter.indent = emitter.best_indent
@@ -241,6 +243,7 @@ func yaml_emitter_increase_indent(emitter *yaml_emitter_t, flow, indentless bool
 			emitter.indent += 2
 		} else if emitter.state == yaml_EMIT_BLOCK_SEQUENCE_FIRST_ITEM_STATE {
 			// [Go] Arrays align to the chosen indentation.
+			emitter.log.Printf("% v% 2d yaml_emitter_increase_indent():   non-root BLOCK_SEQUENCE_FIRST_ITEM_STATE; flow=%t indentless=%t", emitter.indents, emitter.indent, flow, indentless)
 			emitter.indent = emitter.best_array_indent * ((emitter.indent + emitter.best_array_indent) / emitter.best_array_indent)
 		} else {
 			// Everything else aligns to the chosen indentation.
@@ -486,6 +489,7 @@ func yaml_emitter_emit_document_content(emitter *yaml_emitter_t, event *yaml_eve
 	emitter.states = append(emitter.states, yaml_EMIT_DOCUMENT_END_STATE)
 
 	if !yaml_emitter_process_head_comment(emitter) {
+		emitter.log.Printf("% v% 2d yaml_emitter_emit_document_content()", emitter.indents, emitter.indent)
 		return false
 	}
 	if !yaml_emitter_emit_node(emitter, event, true, false, false, false) {
@@ -730,6 +734,7 @@ func yaml_emitter_emit_flow_mapping_value(emitter *yaml_emitter_t, event *yaml_e
 
 // Expect a block item node.
 func yaml_emitter_emit_block_sequence_item(emitter *yaml_emitter_t, event *yaml_event_t, first bool) bool {
+	emitter.log.Printf("% v% 2d yaml_emitter_emit_block_sequence_item(): first=%t", emitter.indents, emitter.indent, first)
 	if first {
 		if !yaml_emitter_increase_indent(emitter, false, emitter.indentless_block_sequence) {
 			return false
@@ -1119,6 +1124,7 @@ func yaml_emitter_process_scalar(emitter *yaml_emitter_t) bool {
 
 // Write a head comment.
 func yaml_emitter_process_head_comment(emitter *yaml_emitter_t) bool {
+	emitter.log.Printf("% v% 2d yaml_emitter_process_head_comment(): head_comment=%s", emitter.indents, emitter.indent, emitter.head_comment)
 	if len(emitter.tail_comment) > 0 {
 		if !yaml_emitter_write_indent(emitter) {
 			return false

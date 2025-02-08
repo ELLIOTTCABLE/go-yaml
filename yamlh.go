@@ -25,6 +25,7 @@ package yaml
 import (
 	"fmt"
 	"io"
+	"log"
 )
 
 // The version directive data.
@@ -707,6 +708,7 @@ const (
 // All members are internal.  Manage the structure using the @c yaml_emitter_
 // family of functions.
 type yaml_emitter_t struct {
+	log *log.Logger
 
 	// Error handling
 

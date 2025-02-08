@@ -24,6 +24,8 @@ package yaml
 
 import (
 	"io"
+	"log"
+	"os"
 )
 
 func yaml_insert_token(parser *yaml_parser_t, pos int, token *yaml_token_t) {
@@ -108,6 +110,7 @@ func yaml_parser_set_encoding(parser *yaml_parser_t, encoding yaml_encoding_t) {
 // Create a new emitter object.
 func yaml_emitter_initialize(emitter *yaml_emitter_t) {
 	*emitter = yaml_emitter_t{
+		log:        log.New(os.Stderr, "[DEBUG]: ", 1),
 		buffer:     make([]byte, output_buffer_size),
 		raw_buffer: make([]byte, 0, output_raw_buffer_size),
 		states:     make([]yaml_emitter_state_t, 0, initial_stack_size),
